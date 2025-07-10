@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://simple-rotation-payment.onrender.com'; // Replace this
+const BACKEND_URL = 'https://simple-rotation-payment-backend.onrender.com'; // Replace this
 
 async function fetchCards() {
   const res = await fetch(`${BACKEND_URL}/cards`);
