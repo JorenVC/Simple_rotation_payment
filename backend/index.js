@@ -38,10 +38,21 @@ app.delete('/cards/:id', async (req, res) => {
 app.put('/cards/:id/toggle', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
+
+  // Check if card exists
+  const cardResult = await db.query('SELECT label FROM cards WHERE id = $1', [id]);
+  if (cardResult.rowCount === 0) {
+    return res.status(404).send('Card not found');
+  }
+
+  const label = cardResult.rows[0].label;
+
+  // Insert log with label (denormalized)
   await db.query(
-    'INSERT INTO logs (card_id, status) VALUES ($1, $2)',
-    [id, status]
+    'INSERT INTO logs (card_id, status, card_label) VALUES ($1, $2, $3)',
+    [id, status, label]
   );
+
   res.send('Switch toggled');
 });
 
