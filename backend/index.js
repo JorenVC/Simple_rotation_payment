@@ -16,14 +16,15 @@ app.use(express.json());
 
 // Get all cards
 app.get('/cards', async (req, res) => {
-  const result = await db.query('SELECT * FROM cards ORDER BY id');
+  const result = await db.query('SELECT * FROM cards');
   res.json(result.rows);
 });
+
 
 // Add a card
 app.post('/cards', async (req, res) => {
   const { label } = req.body;
-  await db.query('INSERT INTO cards (label) VALUES ($1)', [label]);
+  await db.query('INSERT INTO cards (label, payment_count) VALUES ($1, 0)', [label]);
   res.status(201).send('Card added');
 });
 

@@ -70,34 +70,24 @@ function createLogItem(log, cards) {
 
 
 async function render() {
-  const cards = await fetchCards();
+  const cards = await fetchCards(); // includes payment_count
   const logs = await fetchLogs();
 
-  // Count how many times each card has status "Betaald"
-  const paymentCounts = {};
-  logs.forEach(log => {
-    if (log.status === 'Betaald') {
-      paymentCounts[log.card_id] = (paymentCounts[log.card_id] || 0) + 1;
-    } else if (log.status === 'fout') {
-      paymentCounts[log.card_id] = Math.max((paymentCounts[log.card_id] || 0) - 1, 0);
-    }
-  });
-
-  // Render cards with their payment count
+  // Render cards using payment_count
   const cardList = document.getElementById('cardList');
   cardList.innerHTML = '';
   cards.forEach(card => {
-    const payments = paymentCounts[card.id] || 0;
-    cardList.appendChild(createCardElement(card, payments));
+    cardList.appendChild(createCardElement(card, card.payment_count));
   });
 
-  // Render logs (pass cards and counts to include xN)
+  // Render logs (you no longer need to pass paymentCounts)
   const logList = document.getElementById('logList');
   logList.innerHTML = '';
   logs.slice(0, 10).forEach(log => {
-    logList.appendChild(createLogItem(log, cards, paymentCounts));
+    logList.appendChild(createLogItem(log, cards));
   });
 }
+
 
 document.getElementById('cardList').addEventListener('click', async e => {
   if (e.target.classList.contains('delete-btn')) {
