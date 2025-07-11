@@ -39,22 +39,35 @@ app.put('/cards/:id/toggle', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  // Check if card exists
+  // Check if card exists and get label
   const cardResult = await db.query('SELECT label FROM cards WHERE id = $1', [id]);
   if (cardResult.rowCount === 0) {
     return res.status(404).send('Card not found');
   }
-
   const label = cardResult.rows[0].label;
 
-  // Insert log with label (denormalized)
+  // Insert log with label
   await db.query(
     'INSERT INTO logs (card_id, status, card_label) VALUES ($1, $2, $3)',
     [id, status, label]
   );
 
-  res.send('Switch toggled');
+  // Update payment counter
+  if (status === 'Betaald') {
+    await db.query(
+      'UPDATE cards SET payment_count = payment_count + 1 WHERE id = $1',
+      [id]
+    );
+  } else if (status === 'fout') {
+    await db.query(
+      'UPDATE cards SET payment_count = GREATEST(payment_count - 1, 0) WHERE id = $1',
+      [id]
+    );
+  }
+
+  res.send('Switch toggled and counter updated');
 });
+
 
 // Get logs
 app.get('/logs', async (req, res) => {
