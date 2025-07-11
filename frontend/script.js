@@ -37,9 +37,9 @@ function createCardElement(card) {
   const div = document.createElement('div');
   div.className = 'card';
   div.innerHTML = `
-    <span>${card.label}</span>
-    <button class="toggle-btn" data-id="${card.id}" data-status="on">Betaald</button>
-    <button class="toggle-btn" data-id="${card.id}" data-status="off">-</button>
+    <span>${card.label} (x${payments})</span>
+    <button class="toggle-btn" data-id="${card.id}" data-status="Betaald">Betaald</button>
+    <button class="toggle-btn" data-id="${card.id}" data-status="fout">-</button>
     <button class="delete-btn" data-id="${card.id}">🗑</button>
   `;
   return div;
@@ -54,8 +54,17 @@ function createLogItem(log, cards) {
     year: 'numeric'
   });
   const card = cards.find(card => card.id === log.card_id);
-  const label = card ? card.label : 'Unknown Card';
-  li.textContent = `${label} -> ${log.status.toUpperCase()} @ ${date}`;
+  const label = card ? card.label : 'Onbekende kaart';
+
+  let count = paymentCounts[log.card_id] || 0;
+  let labelWithCount = label;
+
+  if (log.status === 'Betaald') {
+    // Show count only on 'Betaald' logs
+    labelWithCount += ` (x${count})`;
+  }
+
+  li.textContent = `${labelWithCount} -> ${log.status.toUpperCase()} @ ${date}`;
   return li;
 }
 
@@ -64,32 +73,48 @@ async function render() {
   const cards = await fetchCards();
   const logs = await fetchLogs();
 
+  // Count how many times each card has status "Betaald"
+  const paymentCounts = {};
+  logs.forEach(log => {
+    if (log.status === 'Betaald') {
+      paymentCounts[log.card_id] = (paymentCounts[log.card_id] || 0) + 1;
+    } else if (log.status === 'fout') {
+      paymentCounts[log.card_id] = Math.max((paymentCounts[log.card_id] || 0) - 1, 0);
+    }
+  });
+
+  // Render cards with their payment count
   const cardList = document.getElementById('cardList');
   cardList.innerHTML = '';
-  cards.forEach(card => cardList.appendChild(createCardElement(card)));
+  cards.forEach(card => {
+    const payments = paymentCounts[card.id] || 0;
+    cardList.appendChild(createCardElement(card, payments));
+  });
 
+  // Render logs (pass cards and counts to include xN)
   const logList = document.getElementById('logList');
   logList.innerHTML = '';
-  logs.slice(0, 10).forEach(log => logList.appendChild(createLogItem(log, cards)));
+  logs.slice(0, 10).forEach(log => {
+    logList.appendChild(createLogItem(log, cards, paymentCounts));
+  });
 }
-
-document.getElementById('addCardForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const input = document.getElementById('cardLabel');
-  const label = input.value.trim();
-  if (label) {
-    await addCard(label);
-    input.value = '';
-  }
-});
 
 document.getElementById('cardList').addEventListener('click', async e => {
   if (e.target.classList.contains('delete-btn')) {
     const id = e.target.dataset.id;
-    await deleteCard(id);
+    const confirmDelete = confirm('Weet je zeker dat je deze kaart wilt verwijderen?');
+    if (confirmDelete) {
+      await deleteCard(id);
+    }
   } else if (e.target.classList.contains('toggle-btn')) {
     const id = e.target.dataset.id;
     const status = e.target.dataset.status;
+
+    if (status === 'fout') {
+      const confirmUndo = confirm('Weet je zeker dat je een betaling wilt verwijderen (x-1)?');
+      if (!confirmUndo) return;
+    }
+
     await toggleCard(id, status);
   }
 });
