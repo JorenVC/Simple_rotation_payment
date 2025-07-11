@@ -38,19 +38,27 @@ function createCardElement(card) {
   div.className = 'card';
   div.innerHTML = `
     <span>${card.label}</span>
-    <button class="toggle-btn" data-id="${card.id}" data-status="on">ON</button>
-    <button class="toggle-btn" data-id="${card.id}" data-status="off">OFF</button>
+    <button class="toggle-btn" data-id="${card.id}" data-status="on">Betaald</button>
+    <button class="toggle-btn" data-id="${card.id}" data-status="off">-</button>
     <button class="delete-btn" data-id="${card.id}">🗑</button>
   `;
   return div;
 }
 
-function createLogItem(log) {
+function createLogItem(log, cards) {
   const li = document.createElement('li');
-  const date = new Date(log.timestamp).toLocaleString();
-  li.textContent = `${log.card_label} → ${log.status.toUpperCase()} @ ${date}`;
+  const date = new Date(log.timestamp).toLocaleDateString(
+    'nl-NL', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+  const card = cards.find(card => card.id === log.card_id);
+  const label = card ? card.label : 'Unknown Card';
+  li.textContent = `${label} -> ${log.status.toUpperCase()} @ ${date}`;
   return li;
 }
+
 
 async function render() {
   const cards = await fetchCards();
@@ -62,7 +70,7 @@ async function render() {
 
   const logList = document.getElementById('logList');
   logList.innerHTML = '';
-  logs.slice(0, 10).forEach(log => logList.appendChild(createLogItem(log)));
+  logs.slice(0, 10).forEach(log => logList.appendChild(createLogItem(log, cards)));
 }
 
 document.getElementById('addCardForm').addEventListener('submit', async e => {
