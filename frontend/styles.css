@@ -58,7 +58,7 @@ button {
   color: white;
 }
 
-.toggle-btn[data-status="off"] {
+.toggle-btn[data-status="fout"] {
   background: #f44336;
 }
 
