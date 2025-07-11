@@ -70,7 +70,7 @@ function createLogItem(log, cards) {
 
 
 async function render() {
-  const cards = await fetchCards(); // includes payment_count
+  const cards = await fetchCards();
   const logs = await fetchLogs();
 
   // Render cards using payment_count

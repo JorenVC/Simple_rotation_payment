@@ -24,7 +24,7 @@ app.get('/cards', async (req, res) => {
 // Add a card
 app.post('/cards', async (req, res) => {
   const { label } = req.body;
-  await db.query('INSERT INTO cards (label, payment_count) VALUES ($1, 0)', [label]);
+  await db.query('INSERT INTO cards (label, payment_count) VALUES ($1, $2)', [label, 0]);
   res.status(201).send('Card added');
 });
 
