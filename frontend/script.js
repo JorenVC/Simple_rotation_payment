@@ -109,4 +109,14 @@ document.getElementById('cardList').addEventListener('click', async e => {
   }
 });
 
+document.getElementById('addCardForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const input = document.getElementById('cardLabel');
+  const label = input.value.trim();
+  if (label) {
+    addCard(label);
+    input.value = '';
+  }
+});
+
 render();
