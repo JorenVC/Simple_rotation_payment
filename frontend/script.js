@@ -47,8 +47,7 @@ function createCardElement(card) {
 
 function createLogItem(log, cards) {
   const li = document.createElement('li');
-  const date = new Date(log.timestamp).toLocaleDateString(
-    'nl-NL', {
+  const date = new Date(log.timestamp).toLocaleDateString('nl-NL', {
     day: '2-digit',
     month: 'long',
     year: 'numeric'
@@ -56,17 +55,10 @@ function createLogItem(log, cards) {
   const card = cards.find(card => card.id === log.card_id);
   const label = card ? card.label : 'Onbekende kaart';
 
-  let count = paymentCounts[log.card_id] || 0;
-  let labelWithCount = label;
-
-  if (log.status === 'Betaald') {
-    // Show count only on 'Betaald' logs
-    labelWithCount += ` (x${count})`;
-  }
-
-  li.textContent = `${labelWithCount} -> ${log.status.toUpperCase()} @ ${date}`;
+  li.textContent = `${label} -> ${log.status.toUpperCase()} @ ${date}`;
   return li;
 }
+
 
 
 async function render() {
