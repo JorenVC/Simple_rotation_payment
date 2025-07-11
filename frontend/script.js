@@ -47,8 +47,8 @@ function createCardElement(card) {
 
 function createLogItem(log) {
   const li = document.createElement('li');
-  const date = new Date(log.timestamp);
-  li.textContent = `Card ${log.card_label} → ${log.status.toUpperCase()} @ ${date.toLocaleString()}`;
+  const date = new Date(log.timestamp).toLocaleString();
+  li.textContent = `${log.card_label} → ${log.status.toUpperCase()} @ ${date}`;
   return li;
 }
 
