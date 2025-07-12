@@ -38,9 +38,11 @@ function createCardElement(card) {
   div.className = 'card';
   div.innerHTML = `
     <span>${card.label} (x${card.payment_count || 0})</span>
+    <div class="buttons">
     <button class="toggle-btn" data-id="${card.id}" data-status="Betaald">Betaald</button>
     <button class="toggle-btn" data-id="${card.id}" data-status="fout">-</button>
     <button class="delete-btn" data-id="${card.id}">🗑</button>
+    </div>
   `;
   return div;
 }

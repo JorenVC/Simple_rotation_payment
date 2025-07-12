@@ -19,6 +19,10 @@ h1, h2 {
   text-align: center;
 }
 
+h1{
+  font-size: 1.75rem;
+}
+
 form {
   display: flex;
   gap: 10px;
@@ -41,6 +45,8 @@ button {
 
 .card-list .card {
   display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   background: #eee;
@@ -49,8 +55,19 @@ button {
   margin-bottom: 10px;
 }
 
+.buttons{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  background: #eee;
+  padding: 10px;
+  border-radius: 6px;
+}
+
 .card button {
-  margin-left: 5px;
+  flex: 1;
+  margin: 5px;
 }
 
 .toggle-btn {
@@ -70,4 +87,7 @@ button {
 .log-list {
   list-style: none;
   padding-left: 0;
+}
+.log-list > *{
+  margin: 5px 0;
 }
